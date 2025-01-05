@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/resizable";
 import { InfosSidebar } from "./infos-sidebar";
 import { ResumeContent } from "./resume-content";
-import { StructureSidebar } from "./structure-sidebar";
+import { StructureSidebar } from "../resume/structure-sidebar";
 import { FormProvider, useForm } from "react-hook-form";
 import { User } from "next-auth";
 import { useCallback, useEffect, useRef } from "react";
