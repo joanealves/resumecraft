@@ -1,28 +1,15 @@
-import Link from "next/link"
-import Logo from "@/assets/logo.svg"
-import { AIGenerationDropdown } from "./ai-generation-dropdown"
-import { Separator } from "@/components/ui/separator"
-import { BasicInfoSection } from "./sections/basic-info"
-import { SummarySection } from "./sections/summary"
-import { MultiplesSections } from "./sections/multiples"
+import { LucideIcon } from "lucide-react"
 
-export const InfosSidebar = () => {
+type SectionTitleProps = {
+  icon: LucideIcon;
+  title: string;
+};
+
+export const SectionTitle = ({ icon: Icon, title }: SectionTitleProps) => {
   return (
-    <aside className="w-full h-full p-6 overflow-y-auto">
-      <div className="w-full flex items-center justify-between">
-        <Link href="/dashboard/resumes">
-          <Logo className="w-full max-w-[80px]" />
-        </Link>
-
-        <AIGenerationDropdown />
-      </div>
-
-      <Separator className="my-5" />
-
-      <BasicInfoSection />
-      <Separator className="my-5" />
-      <SummarySection />
-      <MultiplesSections />
-    </aside>
+    <div className="flex items-center gap-2">
+      <Icon size={18} className="text-muted-foreground" />
+      <h3 className="text-2xl font-title font-bold">{title}</h3>
+    </div>
   )
 }
