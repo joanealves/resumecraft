@@ -2,7 +2,7 @@ import { ReactNode } from "react"
 import Logo from "@/assets/logo.svg"
 import { NavItems } from "@/components/pages/dashboard/nav-items";
 import { UserDropdown } from "@/components/pages/dashboard/user-dropdown";
-import { ThemeToggle } from "@/components/shared/theme-toggle"
+import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { auth } from "@/lib/auth";
 
 type DashboardLayoutProps = {
