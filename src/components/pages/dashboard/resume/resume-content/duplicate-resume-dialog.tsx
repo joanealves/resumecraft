@@ -1,75 +1,70 @@
+"use client"
+
 import { Button } from "@/components/ui/button";
-import { Tooltip } from "@/components/ui/tooltip";
-import { Copy, Download, Home, Trash } from "lucide-react";
-import Link from "next/link";
-import { DeleteResumeDialog } from "./delete-resume-dialog";
-import { DuplicateResumeDialog } from "./duplicate-resume-dialog";
-import { useResumeDownload } from "@/hooks/use-resume-download";
+import { BaseDialogProps, Dialog } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { duplicateResume } from "@/db/actions";
+import { useMutation } from "@tanstack/react-query";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
-type NavigationHeaderProps = {
+type FormData = {
   title: string;
-};
+}
 
-export const NavigationHeader = ({ title }: NavigationHeaderProps) => {
-  const { handleDownloadResume, isLoading } = useResumeDownload(title);
+export const DuplicateResumeDialog = (props: BaseDialogProps) => {
+  const [open, setOpen] = useState(false);
+
+  const methods = useForm<FormData>();
+
+  const params = useParams();
+  const router = useRouter();
+
+  const resumeId = params.id as string;
+
+  const { mutate: handleDuplicateResume, isPending } = useMutation({
+    mutationFn: (title: string) => duplicateResume(resumeId, title),
+    onSuccess: (newResume) => {
+      toast.success("Currículo duplicado com sucesso.");
+      setOpen(false);
+      router.push(`/dashboard/resumes/${newResume.id}`);
+    }
+  })
+
+  const onSubmit = async (data: FormData) => {
+    handleDuplicateResume(data.title);
+  }
 
   return (
-    <header className="absolute w-full left-0 top-0 z-10 p-2 bg-background border-b border-muted flex items-center justify-between gap-2">
-      <div className="flex items-center gap-2">
-        <Tooltip content="Voltar ao painel">
-          <Link href="/dashboard/resumes" passHref>
-            <Button
-              variant="secondary"
-              className="w-8 h-8 bg-transparent"
-              size="icon"
-            >
-              <Home size={18} />
+    <Dialog
+      {...props}
+      open={open}
+      setOpen={setOpen}
+      title="Duplicar Currículo"
+      description="Será criado um novo currículo com o mesmo conteúdo do atual. Insira o novo título para o currículo."
+      content={
+        <form className="flex flex-col" onSubmit={methods.handleSubmit(onSubmit)}>
+          <Controller
+            control={methods.control}
+            name="title"
+            rules={{ required: "Campo obrigatório" }}
+            render={({ field }) => (
+              <Input placeholder="Novo título" {...field} />
+            )}
+          />
+
+          <div className="flex mt-4 ml-auto gap-3">
+            <Button variant="secondary" onClick={() => setOpen(false)}>
+              Cancelar
             </Button>
-          </Link>
-        </Tooltip>
-
-        <span className="text-muted-foreground">/</span>
-
-        <p className="text-lg font-title font-bold ml-1">{title}</p>
-      </div>
-
-      <div className="flex gap-1">
-        <DeleteResumeDialog>
-          <Tooltip content="Deletar Currículo">
-            <Button
-              variant="secondary"
-              className="w-8 h-8 bg-transparent"
-              size="icon"
-            >
-              <Trash size={18} />
+            <Button type="submit" disabled={isPending}>
+              Duplicar
             </Button>
-          </Tooltip>
-        </DeleteResumeDialog>
-
-        <DuplicateResumeDialog>
-          <Tooltip content="Duplicar Currículo">
-            <Button
-              variant="secondary"
-              className="w-8 h-8 bg-transparent"
-              size="icon"
-            >
-              <Copy size={18} />
-            </Button>
-          </Tooltip>
-        </DuplicateResumeDialog>
-
-        <Tooltip content="Baixar PDF">
-          <Button
-            variant="secondary"
-            className="w-8 h-8 bg-transparent"
-            size="icon"
-            onClick={handleDownloadResume}
-            disabled={isLoading}
-          >
-            <Download size={18} />
-          </Button>
-        </Tooltip>
-      </div>
-    </header>
-  );
-};
+          </div>
+        </form>
+      }
+    />
+  )
+}
